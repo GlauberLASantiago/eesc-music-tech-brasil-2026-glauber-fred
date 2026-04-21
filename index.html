@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Tech Brasil 2026 - Glauber & Fred</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎺</text></svg>">
+    <!-- Favicon atualizado para um Saxofone -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: 'Segoe UI', sans-serif; }
@@ -16,7 +17,7 @@
             opacity: 0;
             transition: opacity 0.4s ease-in-out;
             pointer-events: none;
-            background-size: contain; /* Contain garante que a imagem inteira apareça sem cortes */
+            background-size: contain; 
             background-position: center;
             background-repeat: no-repeat;
             background-color: #000;
@@ -62,13 +63,13 @@
         <h1 class="text-4xl font-bold mb-6 text-blue-400">Music Tech Brasil 2026</h1>
         <p class="text-xl mb-4 max-w-2xl text-center text-gray-300">
             Apresentação: Glauber & Fred<br>
-            26 Slides controlados via Escala Cromática no Trompete.
+            26 Slides controlados via Escala Cromática no Sax Alto.
         </p>
         <p class="text-md mb-8 text-yellow-400 text-center bg-yellow-400/10 p-4 rounded-lg border border-yellow-400/20">
             <strong>Dica:</strong> Após iniciar, pressione a tecla <strong>"H"</strong> para esconder/mostrar o painel de notas.
         </p>
         <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-xl transition-all shadow-lg shadow-blue-500/30">
-            🎺 Iniciar Microfone e Slides
+            🎷 Iniciar Microfone e Slides
         </button>
     </div>
 
@@ -79,7 +80,7 @@
 
     <!-- HUD de Detecção de Notas -->
     <div id="hud" class="hidden">
-        <div class="text-sm text-gray-400 font-semibold mb-1 uppercase tracking-wider">Trompete (Bb)</div>
+        <div class="text-sm text-gray-400 font-semibold mb-1 uppercase tracking-wider">Sax Alto (Eb)</div>
         <div class="flex items-end gap-3 mb-3">
             <div id="current-note" class="text-5xl font-bold text-blue-400">-</div>
             <div id="current-freq" class="text-sm text-gray-500 pb-1">-- Hz</div>
@@ -122,37 +123,37 @@
             presentationDiv.appendChild(slideDiv);
         }
 
-        // --- 2. MAPEAMENTO DA ESCALA CROMÁTICA ---
+        // --- 2. MAPEAMENTO DA ESCALA CROMÁTICA (Base: Ré do Sax Alto) ---
         const noteStrings = ["Dó", "Dó#", "Ré", "Ré#", "Mi", "Fá", "Fá#", "Sol", "Sol#", "Lá", "Lá#", "Si"];
         
-        // Mapeia Dó + Intervalo Cromático para o respectivo slide
+        // Mapeia Ré + Intervalo Cromático para o respectivo slide
         const slideTriggers = {
-            'Dó,Dó': 0,      // Slide 1 (Dó, Dó normal)
-            'Dó,Dó#': 1,     // Slide 2
-            'Dó,Ré': 2,      // Slide 3
-            'Dó,Ré#': 3,     // Slide 4 (Mib)
-            'Dó,Mi': 4,      // Slide 5
-            'Dó,Fá': 5,      // Slide 6
-            'Dó,Fá#': 6,     // Slide 7
-            'Dó,Sol': 7,     // Slide 8
-            'Dó,Sol#': 8,    // Slide 9
-            'Dó,Lá': 9,      // Slide 10
-            'Dó,Lá#': 10,    // Slide 11 (Sib)
-            'Dó,Si': 11,     // Slide 12
-            'Dó,Dó↑': 12,    // Slide 13 (Dó Oitava Acima)
-            'Dó,Dó#↑': 13,   // Slide 14
-            'Dó,Ré↑': 14,    // Slide 15
-            'Dó,Ré#↑': 15,   // Slide 16
-            'Dó,Mi↑': 16,    // Slide 17
-            'Dó,Fá↑': 17,    // Slide 18
-            'Dó,Fá#↑': 18,   // Slide 19
-            'Dó,Sol↑': 19,   // Slide 20
-            'Dó,Sol#↑': 20,  // Slide 21
-            'Dó,Lá↑': 21,    // Slide 22
-            'Dó,Lá#↑': 22,   // Slide 23
-            'Dó,Si↑': 23,    // Slide 24
-            'Dó,Dó↑↑': 24,   // Slide 25 (Dó Duas Oitavas Acima)
-            'Dó,Dó#↑↑': 25   // Slide 26
+            'Ré,Ré': 0,      // Slide 1 (Ré, Ré normal)
+            'Ré,Ré#': 1,     // Slide 2 (Mib)
+            'Ré,Mi': 2,      // Slide 3
+            'Ré,Fá': 3,      // Slide 4 
+            'Ré,Fá#': 4,     // Slide 5
+            'Ré,Sol': 5,     // Slide 6
+            'Ré,Sol#': 6,    // Slide 7 (Láb)
+            'Ré,Lá': 7,      // Slide 8
+            'Ré,Lá#': 8,     // Slide 9 (Sib)
+            'Ré,Si': 9,      // Slide 10
+            'Ré,Dó': 10,     // Slide 11 
+            'Ré,Dó#': 11,    // Slide 12
+            'Ré,Ré↑': 12,    // Slide 13 (Ré Oitava Acima)
+            'Ré,Ré#↑': 13,   // Slide 14
+            'Ré,Mi↑': 14,    // Slide 15
+            'Ré,Fá↑': 15,    // Slide 16
+            'Ré,Fá#↑': 16,   // Slide 17
+            'Ré,Sol↑': 17,   // Slide 18
+            'Ré,Sol#↑': 18,  // Slide 19
+            'Ré,Lá↑': 19,    // Slide 20
+            'Ré,Lá#↑': 20,   // Slide 21
+            'Ré,Si↑': 21,    // Slide 22
+            'Ré,Dó↑': 22,    // Slide 23
+            'Ré,Dó#↑': 23,   // Slide 24
+            'Ré,Ré↑↑': 24,   // Slide 25 (Ré Duas Oitavas Acima)
+            'Ré,Ré#↑↑': 25   // Slide 26
         };
 
         // --- 3. VARIÁVEIS DE ESTADO DO ÁUDIO ---
@@ -263,11 +264,13 @@
                 silenceFrames = 0;
                 let concertNoteNum = noteFromPitch(ac);
                 
-                // Transposição Bb
-                let trumpetNoteNum = concertNoteNum + 2; 
+                // TRANSPOSIÇÃO PARA SAX ALTO Eb (+9 semitons)
+                // O saxofone alto soa uma Sexta Maior abaixo da nota escrita.
+                // Somando 9 semitons à nota de concerto obtemos a nota que o saxofonista lê/pensa.
+                let saxNoteNum = concertNoteNum + 9; 
                 
-                let noteNameBase = noteStrings[trumpetNoteNum % 12];
-                let octave = Math.floor(trumpetNoteNum / 12) - 1;
+                let noteNameBase = noteStrings[saxNoteNum % 12];
+                let octave = Math.floor(saxNoteNum / 12) - 1;
                 let noteNameFull = noteNameBase + octave;
 
                 freqDisplay.innerText = Math.round(ac) + " Hz";
@@ -275,7 +278,7 @@
                 if (noteNameFull === lastDetectedNoteFull) {
                     noteSustainFrames++;
                     if (noteSustainFrames === 8) { // Confirmação da nota
-                        registerNote(noteNameBase, trumpetNoteNum);
+                        registerNote(noteNameBase, saxNoteNum);
                     }
                 } else {
                     lastDetectedNoteFull = noteNameFull;
