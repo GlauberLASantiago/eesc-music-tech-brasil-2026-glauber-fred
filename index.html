@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Tech Brasil 2026 - Glauber & Fred</title>
-    <!-- Favicon atualizado para um Saxofone -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -58,7 +57,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- Overlay de Inicialização -->
     <div id="start-overlay">
         <h1 class="text-4xl font-bold mb-6 text-blue-400">Music Tech Brasil 2026</h1>
         <p class="text-xl mb-4 max-w-2xl text-center text-gray-300">
@@ -66,19 +64,17 @@
             26 Slides controlados via Escala Cromática no Sax Alto.
         </p>
         <p class="text-md mb-8 text-yellow-400 text-center bg-yellow-400/10 p-4 rounded-lg border border-yellow-400/20">
-            <strong>Dica:</strong> Após iniciar, pressione a tecla <strong>"H"</strong> para esconder/mostrar o painel de notas.
+            <strong>Dica:</strong> Após iniciar, pressione <strong>"H"</strong> ou <strong>toque na tela</strong> para esconder/mostrar o painel.
         </p>
         <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-xl transition-all shadow-lg shadow-blue-500/30">
             🎷 Iniciar Microfone e Slides
         </button>
     </div>
 
-    <!-- Indicador de Página Fixo -->
-    <div id="page-indicator" class="absolute bottom-4 left-4 text-white/50 font-mono text-lg font-bold tracking-widest z-50 bg-black/60 px-4 py-2 rounded-lg border border-white/10">
+    <div id="page-indicator" class="absolute bottom-4 left-4 text-white/50 font-mono text-lg font-bold tracking-widest z-50 bg-black/60 px-4 py-2 rounded-lg border border-white/10 transition-opacity duration-300">
         1 / 26
     </div>
 
-    <!-- HUD de Detecção de Notas -->
     <div id="hud" class="hidden">
         <div class="text-sm text-gray-400 font-semibold mb-1 uppercase tracking-wider">Sax Alto (Eb)</div>
         <div class="flex items-end gap-3 mb-3">
@@ -104,10 +100,8 @@
         </div>
     </div>
 
-    <!-- SLIDES DA APRESENTAÇÃO (GERADOS DINAMICAMENTE PELO JAVASCRIPT) -->
-    <div id="presentation">
-        <!-- As imagens do GitHub serão injetadas aqui -->
-    </div>
+    <div id="presentation" class="cursor-pointer">
+        </div>
 
     <script>
         // --- 1. GERAÇÃO DOS SLIDES (IMAGENS DO GITHUB) ---
@@ -126,21 +120,20 @@
         // --- 2. MAPEAMENTO DA ESCALA CROMÁTICA (Base: Ré do Sax Alto) ---
         const noteStrings = ["Dó", "Dó#", "Ré", "Ré#", "Mi", "Fá", "Fá#", "Sol", "Sol#", "Lá", "Lá#", "Si"];
         
-        // Mapeia Ré + Intervalo Cromático para o respectivo slide
         const slideTriggers = {
-            'Ré,Ré': 0,      // Slide 1 (Ré, Ré normal)
-            'Ré,Ré#': 1,     // Slide 2 (Mib)
+            'Ré,Ré': 0,      // Slide 1
+            'Ré,Ré#': 1,     // Slide 2
             'Ré,Mi': 2,      // Slide 3
             'Ré,Fá': 3,      // Slide 4 
             'Ré,Fá#': 4,     // Slide 5
             'Ré,Sol': 5,     // Slide 6
-            'Ré,Sol#': 6,    // Slide 7 (Láb)
+            'Ré,Sol#': 6,    // Slide 7
             'Ré,Lá': 7,      // Slide 8
-            'Ré,Lá#': 8,     // Slide 9 (Sib)
+            'Ré,Lá#': 8,     // Slide 9
             'Ré,Si': 9,      // Slide 10
             'Ré,Dó': 10,     // Slide 11 
             'Ré,Dó#': 11,    // Slide 12
-            'Ré,Ré↑': 12,    // Slide 13 (Ré Oitava Acima)
+            'Ré,Ré↑': 12,    // Slide 13
             'Ré,Ré#↑': 13,   // Slide 14
             'Ré,Mi↑': 14,    // Slide 15
             'Ré,Fá↑': 15,    // Slide 16
@@ -152,7 +145,7 @@
             'Ré,Si↑': 21,    // Slide 22
             'Ré,Dó↑': 22,    // Slide 23
             'Ré,Dó#↑': 23,   // Slide 24
-            'Ré,Ré↑↑': 24,   // Slide 25 (Ré Duas Oitavas Acima)
+            'Ré,Ré↑↑': 24,   // Slide 25
             'Ré,Ré#↑↑': 25   // Slide 26
         };
 
@@ -265,8 +258,6 @@
                 let concertNoteNum = noteFromPitch(ac);
                 
                 // TRANSPOSIÇÃO PARA SAX ALTO Eb (+9 semitons)
-                // O saxofone alto soa uma Sexta Maior abaixo da nota escrita.
-                // Somando 9 semitons à nota de concerto obtemos a nota que o saxofonista lê/pensa.
                 let saxNoteNum = concertNoteNum + 9; 
                 
                 let noteNameBase = noteStrings[saxNoteNum % 12];
@@ -290,7 +281,7 @@
                 if (silenceFrames > 15) {
                     noteDisplay.innerText = "-";
                     freqDisplay.innerText = "-- Hz";
-                    lastRegisteredMidi = null; // Permite repetir notas após pausa
+                    lastRegisteredMidi = null; 
                 }
             }
 
@@ -301,7 +292,6 @@
             if (midiNum !== lastRegisteredMidi) {
                 let triggerToken = noteNameBase;
                 
-                // CALCULA SE HOUVE SALTO DE OITAVA EM RELAÇÃO À ÚLTIMA NOTA TOCADA
                 if (lastActiveMidi !== null) {
                     let octaveA = Math.floor(lastActiveMidi / 12);
                     let octaveB = Math.floor(midiNum / 12);
@@ -323,7 +313,6 @@
                 updateSequenceUI();
                 checkSlideTriggers();
 
-                // Limpa sequência após 5 segundos sem tocar
                 if (sequenceClearTimeout) clearTimeout(sequenceClearTimeout);
                 sequenceClearTimeout = setTimeout(() => {
                     currentSequence = [];
@@ -339,7 +328,6 @@
                 if (seqStr.endsWith(triggerPattern)) {
                     goToSlide(targetSlideIndex);
                     
-                    // Efeito visual de sucesso
                     hud.classList.add('ring-4', 'ring-green-500', 'bg-green-900/50');
                     setTimeout(() => hud.classList.remove('ring-4', 'ring-green-500', 'bg-green-900/50'), 500);
                     
@@ -372,17 +360,27 @@
             pageIndicator.innerText = `${currentSlideIndex + 1} / ${totalSlides}`;
         }
         
+        // --- 4. CONTROLES DE INTERFACE (TECLADO E TOQUE) ---
+
+        // Função para alternar visibilidade dos painéis (HUD e Indicador)
+        function toggleUI() {
+            hud.style.opacity = hud.style.opacity === '0' ? '1' : '0';
+            pageIndicator.style.opacity = pageIndicator.style.opacity === '0' ? '1' : '0';
+        }
+
         // Atalhos de teclado
         document.addEventListener('keydown', (e) => {
-            // Setas para navegar manualmente
             if (e.key === 'ArrowRight') goToSlide(Math.min(currentSlideIndex + 1, totalSlides - 1));
             if (e.key === 'ArrowLeft') goToSlide(Math.max(currentSlideIndex - 1, 0));
             
-            // Tecla 'H' para Esconder/Mostrar o HUD e manter a magia intacta
             if (e.key.toLowerCase() === 'h') {
-                hud.style.opacity = hud.style.opacity === '0' ? '1' : '0';
-                pageIndicator.style.opacity = pageIndicator.style.opacity === '0' ? '1' : '0';
+                toggleUI();
             }
+        });
+
+        // Clique/Toque na tela para ocultar/mostrar a interface
+        presentationDiv.addEventListener('click', () => {
+            toggleUI();
         });
 
         // Navegação por toque (deslizar para esquerda/direita)
@@ -390,6 +388,7 @@
         document.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
         }, { passive: true });
+        
         document.addEventListener('touchend', (e) => {
             const deltaX = e.changedTouches[0].clientX - touchStartX;
             if (Math.abs(deltaX) > 50) {
