@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Tech Brasil 2026 - Glauber & Fred</title>
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎷</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -27,21 +28,6 @@
             z-index: 10;
         }
 
-        /* HUD (Heads Up Display) do afinador/detector */
-        #hud {
-            position: absolute;
-            bottom: 2rem; right: 2rem;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            z-index: 50;
-            min-width: 250px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-            transition: opacity 0.3s ease;
-        }
-
         /* Overlay Inicial */
         #start-overlay {
             position: absolute;
@@ -53,55 +39,74 @@
             justify-content: center;
             align-items: center;
         }
+        
+        /* Ocultar elementos suavemente */
+        .fade-hide {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body class="antialiased">
 
+    <!-- Overlay de Inicialização -->
     <div id="start-overlay">
         <h1 class="text-4xl font-bold mb-6 text-blue-400">Music Tech Brasil 2026</h1>
         <p class="text-xl mb-4 max-w-2xl text-center text-gray-300">
             Apresentação: Glauber & Fred<br>
-            26 Slides controlados via Escala Cromática no Sax Alto.
+            26 Slides controlados via <strong>Arpejos (Acordes)</strong> no Sax Alto.
         </p>
         <p class="text-md mb-8 text-yellow-400 text-center bg-yellow-400/10 p-4 rounded-lg border border-yellow-400/20">
-            <strong>Dica:</strong> Após iniciar, pressione <strong>"H"</strong> ou <strong>toque na tela</strong> para esconder/mostrar o painel.
+            <strong>Dica:</strong> Após iniciar, pressione <strong>"H"</strong> ou <strong>toque na tela</strong> para esconder/mostrar o painel de notas.
         </p>
         <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-xl transition-all shadow-lg shadow-blue-500/30">
             🎷 Iniciar Microfone e Slides
         </button>
     </div>
 
-    <div id="page-indicator" class="absolute bottom-4 left-4 text-white/50 font-mono text-lg font-bold tracking-widest z-50 bg-black/60 px-4 py-2 rounded-lg border border-white/10 transition-opacity duration-300">
+    <!-- Indicador de Página Fixo -->
+    <div id="page-indicator" class="absolute top-4 right-4 text-white/50 font-mono text-lg font-bold tracking-widest z-50 bg-black/60 px-4 py-2 rounded-lg border border-white/10 transition-opacity duration-300">
         1 / 26
     </div>
 
-    <div id="hud" class="hidden">
-        <div class="text-sm text-gray-400 font-semibold mb-1 uppercase tracking-wider">Sax Alto (Eb)</div>
-        <div class="flex items-end gap-3 mb-3">
-            <div id="current-note" class="text-5xl font-bold text-blue-400">-</div>
-            <div id="current-freq" class="text-sm text-gray-500 pb-1">-- Hz</div>
+    <!-- HUD (Heads Up Display) - Estilo Horizontal Compacto (Bottom Center) -->
+    <div id="hud" class="hidden absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/85 backdrop-blur-md border border-white/15 px-6 py-3 rounded-full flex items-center gap-6 shadow-2xl z-50 transition-opacity duration-300 transition-all">
+        
+        <!-- Bloco 1: Nota Atual -->
+        <div class="flex items-center gap-3">
+            <div class="text-[10px] text-gray-400 font-bold uppercase leading-tight text-right tracking-wider">Sax<br>Eb</div>
+            <div id="current-note" class="text-3xl font-bold text-blue-400 w-14 text-center">-</div>
+            <div id="current-freq" class="text-[11px] text-gray-500 w-10">-- Hz</div>
         </div>
-        <div class="text-xs text-gray-500 mb-1">Sequência atual (Limpa em 5s):</div>
-        <div id="sequence-display" class="flex gap-2 h-8"></div>
 
-        <div class="mt-4 border-t border-slate-700 pt-3">
-            <div class="flex justify-between text-xs text-gray-400 mb-1">
-                <span>Gate (Rejeitar Ruído)</span>
-                <span id="sens-val">2.0</span>
+        <div class="w-px h-8 bg-slate-700"></div>
+
+        <!-- Bloco 2: Sequência / Arpejo -->
+        <div class="flex flex-col items-center justify-center min-w-[140px]">
+            <div class="text-[9px] text-gray-500 mb-1.5 uppercase tracking-widest font-bold">Arpejo Atual</div>
+            <div id="sequence-display" class="flex gap-1 h-5 justify-center items-center">
+                <!-- Notas aparecerão aqui -->
             </div>
-            <input type="range" id="sensitivity-slider" min="0.001" max="0.1" step="0.001" value="0.02" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 mb-3">
-            
-            <div class="text-xs text-gray-400 mb-1 flex justify-between">
-                <span>Volume (Sopro)</span>
+        </div>
+
+        <div class="w-px h-8 bg-slate-700"></div>
+
+        <!-- Bloco 3: Controles (Gate/Sensibilidade e VU Meter) -->
+        <div class="flex flex-col w-28 gap-2">
+            <div class="flex items-center justify-between gap-2">
+                <span class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Gate</span>
+                <input type="range" id="sensitivity-slider" min="0.001" max="0.1" step="0.001" value="0.02" class="w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
             </div>
-            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                 <div id="vu-meter" class="h-full bg-gradient-to-r from-green-500 via-yellow-400 to-red-500" style="width: 0%; transition: width 0.05s ease-out;"></div>
             </div>
         </div>
     </div>
 
+    <!-- SLIDES DA APRESENTAÇÃO -->
     <div id="presentation" class="cursor-pointer">
-        </div>
+        <!-- Imagens injetadas via JS -->
+    </div>
 
     <script>
         // --- 1. GERAÇÃO DOS SLIDES (IMAGENS DO GITHUB) ---
@@ -117,36 +122,48 @@
             presentationDiv.appendChild(slideDiv);
         }
 
-        // --- 2. MAPEAMENTO DA ESCALA CROMÁTICA (Base: Ré do Sax Alto) ---
+        // --- 2. MAPEAMENTO DOS ARPEJOS (Baseado no Sax Alto) ---
         const noteStrings = ["Dó", "Dó#", "Ré", "Ré#", "Mi", "Fá", "Fá#", "Sol", "Sol#", "Lá", "Lá#", "Si"];
         
+        // Mapeamento Enarmônico (ex: Sib é Lido como Lá#, Réb como Dó# pelo afinador)
         const slideTriggers = {
-            'Ré,Ré': 0,      // Slide 1
-            'Ré,Ré#': 1,     // Slide 2
-            'Ré,Mi': 2,      // Slide 3
-            'Ré,Fá': 3,      // Slide 4 
-            'Ré,Fá#': 4,     // Slide 5
-            'Ré,Sol': 5,     // Slide 6
-            'Ré,Sol#': 6,    // Slide 7
-            'Ré,Lá': 7,      // Slide 8
-            'Ré,Lá#': 8,     // Slide 9
-            'Ré,Si': 9,      // Slide 10
-            'Ré,Dó': 10,     // Slide 11 
-            'Ré,Dó#': 11,    // Slide 12
-            'Ré,Ré↑': 12,    // Slide 13
-            'Ré,Ré#↑': 13,   // Slide 14
-            'Ré,Mi↑': 14,    // Slide 15
-            'Ré,Fá↑': 15,    // Slide 16
-            'Ré,Fá#↑': 16,   // Slide 17
-            'Ré,Sol↑': 17,   // Slide 18
-            'Ré,Sol#↑': 18,  // Slide 19
-            'Ré,Lá↑': 19,    // Slide 20
-            'Ré,Lá#↑': 20,   // Slide 21
-            'Ré,Si↑': 21,    // Slide 22
-            'Ré,Dó↑': 22,    // Slide 23
-            'Ré,Dó#↑': 23,   // Slide 24
-            'Ré,Ré↑↑': 24,   // Slide 25
-            'Ré,Ré#↑↑': 25   // Slide 26
+            // E Chords (1-5)
+            'Mi,Sol#,Si,Ré#': 0,    // Slide 1: Emaj7
+            'Mi,Sol#,Si,Ré': 1,     // Slide 2: E7
+            'Mi,Sol,Si,Ré': 2,      // Slide 3: Em7
+            'Mi,Sol,Lá#,Ré': 3,     // Slide 4: Em7(b5) (Sib -> Lá#)
+            'Mi,Sol,Lá#,Dó#': 4,    // Slide 5: Edim7 (Sib -> Lá#, Réb -> Dó#)
+
+            // F Chords (6-10)
+            'Fá,Lá,Dó,Mi': 5,       // Slide 6: Fmaj7
+            'Fá,Lá,Dó,Ré#': 6,      // Slide 7: F7 (Mib -> Ré#)
+            'Fá,Sol#,Dó,Ré#': 7,    // Slide 8: Fm7 (Láb -> Sol#, Mib -> Ré#)
+            'Fá,Sol#,Si,Ré#': 8,    // Slide 9: Fm7(b5) (Láb -> Sol#, Dób -> Si, Mib -> Ré#)
+            'Fá,Sol#,Si,Ré': 9,     // Slide 10: Fdim7 (Láb -> Sol#, Dób -> Si, Ebb -> Ré)
+
+            // F# Chords (11-15)
+            'Fá#,Lá#,Dó#,Fá': 10,   // Slide 11: F#maj7 (E# -> Fá)
+            'Fá#,Lá#,Dó#,Mi': 11,   // Slide 12: F#7
+            'Fá#,Lá,Dó#,Mi': 12,    // Slide 13: F#m7
+            'Fá#,Lá,Dó,Mi': 13,     // Slide 14: F#m7(b5)
+            'Fá#,Lá,Dó,Ré#': 14,    // Slide 15: F#dim7 (Eb -> Ré#)
+
+            // G Chords (16-20)
+            'Sol,Si,Ré,Fá#': 15,    // Slide 16: Gmaj7
+            'Sol,Si,Ré,Fá': 16,     // Slide 17: G7
+            'Sol,Lá#,Ré,Fá': 17,    // Slide 18: Gm7 (Bb -> Lá#)
+            'Sol,Lá#,Dó#,Fá': 18,   // Slide 19: Gm7(b5) (Bb -> Lá#, Db -> Dó#)
+            'Sol,Lá#,Dó#,Mi': 19,   // Slide 20: Gdim7 (Bb -> Lá#, Db -> Dó#, Fb -> Mi)
+
+            // Ab Chords (21-25)
+            'Sol#,Dó,Ré#,Sol': 20,  // Slide 21: Abmaj7 (Ab -> Sol#, Eb -> Ré#)
+            'Sol#,Dó,Ré#,Fá#': 21,  // Slide 22: Ab7 (Ab -> Sol#, Eb -> Ré#, Gb -> Fá#)
+            'Sol#,Si,Ré#,Fá#': 22,  // Slide 23: Abm7 (Ab -> Sol#, Cb -> Si, Eb -> Ré#, Gb -> Fá#)
+            'Sol#,Si,Ré,Fá#': 23,   // Slide 24: Abm7(b5) (Ab -> Sol#, Cb -> Si, Ebb -> Ré, Gb -> Fá#)
+            'Sol#,Si,Ré,Fá': 24,    // Slide 25: Abdim7 (Ab -> Sol#, Cb -> Si, Ebb -> Ré, Gbb -> Fá)
+
+            // A Chord (26)
+            'Lá,Dó#,Mi,Sol#': 25    // Slide 26: Amaj7
         };
 
         // --- 3. VARIÁVEIS DE ESTADO DO ÁUDIO ---
@@ -162,7 +179,6 @@
         let silenceFrames = 0;
         
         let lastRegisteredMidi = null;      
-        let lastActiveMidi = null;          
         let currentSlideIndex = 0;
 
         // Elementos UI
@@ -174,15 +190,13 @@
         const sequenceDisplay = document.getElementById('sequence-display');
         const pageIndicator = document.getElementById('page-indicator');
         const sensSlider = document.getElementById('sensitivity-slider');
-        const sensValDisplay = document.getElementById('sens-val');
         const vuMeter = document.getElementById('vu-meter');
         
         let sensitivityThreshold = 0.02; 
 
-        // Atualiza UI da Sensibilidade
+        // Atualiza Sensibilidade
         sensSlider.addEventListener('input', (e) => {
             sensitivityThreshold = parseFloat(e.target.value);
-            sensValDisplay.innerText = (sensitivityThreshold * 100).toFixed(1);
         });
 
         // Inicia
@@ -206,7 +220,7 @@
                 
                 updatePitch();
             } catch (err) {
-                alert('Erro ao aceder ao microfone. Verifique as permissões.');
+                alert('Erro ao acessar o microfone. Verifique as permissões.');
             }
         });
 
@@ -225,7 +239,7 @@
             let vuPercent = Math.min(100, (rms / 0.15) * 100);
             if (vuMeter) vuMeter.style.width = vuPercent + '%';
 
-            // Gate de Sensibilidade
+            // Gate
             if (rms < sensitivityThreshold) return -1;
 
             let r1 = 0, r2 = SIZE - 1, thres = 0.2;
@@ -262,13 +276,13 @@
                 
                 let noteNameBase = noteStrings[saxNoteNum % 12];
                 let octave = Math.floor(saxNoteNum / 12) - 1;
-                let noteNameFull = noteNameBase + octave;
+                let noteNameFull = noteNameBase + octave; // Mantemos o tracking interno com oitava
 
                 freqDisplay.innerText = Math.round(ac) + " Hz";
 
                 if (noteNameFull === lastDetectedNoteFull) {
                     noteSustainFrames++;
-                    if (noteSustainFrames === 8) { // Confirmação da nota
+                    if (noteSustainFrames === 8) { // Confirma a nota
                         registerNote(noteNameBase, saxNoteNum);
                     }
                 } else {
@@ -290,25 +304,13 @@
 
         function registerNote(noteNameBase, midiNum) {
             if (midiNum !== lastRegisteredMidi) {
-                let triggerToken = noteNameBase;
                 
-                if (lastActiveMidi !== null) {
-                    let octaveA = Math.floor(lastActiveMidi / 12);
-                    let octaveB = Math.floor(midiNum / 12);
-                    let octaveDiff = octaveB - octaveA;
-                    
-                    if (octaveDiff === 1) triggerToken += "↑";
-                    else if (octaveDiff === 2) triggerToken += "↑↑";
-                    else if (octaveDiff === 3) triggerToken += "↑↑↑";
-                    else if (octaveDiff === -1) triggerToken += "↓";
-                    else if (octaveDiff === -2) triggerToken += "↓↓";
-                }
-
-                currentSequence.push(triggerToken);
-                if (currentSequence.length > 5) currentSequence.shift();
+                // Registra apenas a nota base (sem oitavas) para formar o Acorde
+                currentSequence.push(noteNameBase);
+                // Mantém as últimas 5 notas (para caso o músico toque notas extras ou de passagem)
+                if (currentSequence.length > 5) currentSequence.shift(); 
                 
                 lastRegisteredMidi = midiNum;
-                lastActiveMidi = midiNum;
                 
                 updateSequenceUI();
                 checkSlideTriggers();
@@ -328,8 +330,9 @@
                 if (seqStr.endsWith(triggerPattern)) {
                     goToSlide(targetSlideIndex);
                     
-                    hud.classList.add('ring-4', 'ring-green-500', 'bg-green-900/50');
-                    setTimeout(() => hud.classList.remove('ring-4', 'ring-green-500', 'bg-green-900/50'), 500);
+                    // Brilho de sucesso
+                    hud.classList.add('ring-2', 'ring-green-400', 'bg-slate-800/90');
+                    setTimeout(() => hud.classList.remove('ring-2', 'ring-green-400', 'bg-slate-800/90'), 500);
                     
                     currentSequence = []; 
                     updateSequenceUI();
@@ -341,9 +344,14 @@
 
         function updateSequenceUI() {
             sequenceDisplay.innerHTML = '';
+            if(currentSequence.length === 0) {
+                sequenceDisplay.innerHTML = '<span class="text-[10px] text-gray-600">Aguardando...</span>';
+                return;
+            }
+            
             currentSequence.forEach(n => {
                 let el = document.createElement('div');
-                el.className = 'bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center justify-center min-w-[30px]';
+                el.className = 'bg-blue-600/80 border border-blue-400/30 text-white text-[10px] font-bold px-1.5 py-0.5 rounded min-w-[24px] text-center';
                 el.innerText = n;
                 sequenceDisplay.appendChild(el);
             });
@@ -362,10 +370,16 @@
         
         // --- 4. CONTROLES DE INTERFACE (TECLADO E TOQUE) ---
 
-        // Função para alternar visibilidade dos painéis (HUD e Indicador)
+        let isUIHidden = false;
         function toggleUI() {
-            hud.style.opacity = hud.style.opacity === '0' ? '1' : '0';
-            pageIndicator.style.opacity = pageIndicator.style.opacity === '0' ? '1' : '0';
+            isUIHidden = !isUIHidden;
+            if (isUIHidden) {
+                hud.classList.add('fade-hide');
+                pageIndicator.classList.add('fade-hide');
+            } else {
+                hud.classList.remove('fade-hide');
+                pageIndicator.classList.remove('fade-hide');
+            }
         }
 
         // Atalhos de teclado
@@ -392,10 +406,13 @@
         document.addEventListener('touchend', (e) => {
             const deltaX = e.changedTouches[0].clientX - touchStartX;
             if (Math.abs(deltaX) > 50) {
-                if (deltaX < 0) goToSlide(Math.min(currentSlideIndex + 1, totalSlides - 1)); // deslizar para esquerda → próximo
-                else            goToSlide(Math.max(currentSlideIndex - 1, 0));               // deslizar para direita → anterior
+                if (deltaX < 0) goToSlide(Math.min(currentSlideIndex + 1, totalSlides - 1)); // próximo
+                else            goToSlide(Math.max(currentSlideIndex - 1, 0));               // anterior
             }
         }, { passive: true });
+
+        // Inicializa UI vazia
+        updateSequenceUI();
 
     </script>
 </body>
