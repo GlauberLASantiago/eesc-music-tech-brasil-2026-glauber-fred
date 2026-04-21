@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Tech Brasil 2026 - Glauber & Fred</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎺</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; color: white; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sistema de Slides (Imagens em Tela Cheia) */
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            pointer-events: none;
+            background-size: contain; /* Contain garante que a imagem inteira apareça sem cortes */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #000;
+        }
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* HUD (Heads Up Display) do afinador/detector */
+        #hud {
+            position: absolute;
+            bottom: 2rem; right: 2rem;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            z-index: 50;
+            min-width: 250px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Overlay Inicial */
+        #start-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Overlay de Inicialização -->
+    <div id="start-overlay">
+        <h1 class="text-4xl font-bold mb-6 text-blue-400">Music Tech Brasil 2026</h1>
+        <p class="text-xl mb-4 max-w-2xl text-center text-gray-300">
+            Apresentação: Glauber & Fred<br>
+            26 Slides controlados via Escala Cromática no Trompete.
+        </p>
+        <p class="text-md mb-8 text-yellow-400 text-center bg-yellow-400/10 p-4 rounded-lg border border-yellow-400/20">
+            <strong>Dica:</strong> Após iniciar, pressione a tecla <strong>"H"</strong> para esconder/mostrar o painel de notas.
+        </p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold text-xl transition-all shadow-lg shadow-blue-500/30">
+            🎺 Iniciar Microfone e Slides
+        </button>
+    </div>
+
+    <!-- Indicador de Página Fixo -->
+    <div id="page-indicator" class="absolute bottom-4 left-4 text-white/50 font-mono text-lg font-bold tracking-widest z-50 bg-black/60 px-4 py-2 rounded-lg border border-white/10">
+        1 / 26
+    </div>
+
+    <!-- HUD de Detecção de Notas -->
+    <div id="hud" class="hidden">
+        <div class="text-sm text-gray-400 font-semibold mb-1 uppercase tracking-wider">Trompete (Bb)</div>
+        <div class="flex items-end gap-3 mb-3">
+            <div id="current-note" class="text-5xl font-bold text-blue-400">-</div>
+            <div id="current-freq" class="text-sm text-gray-500 pb-1">-- Hz</div>
+        </div>
+        <div class="text-xs text-gray-500 mb-1">Sequência atual (Limpa em 5s):</div>
+        <div id="sequence-display" class="flex gap-2 h-8"></div>
+
+        <div class="mt-4 border-t border-slate-700 pt-3">
+            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Gate (Rejeitar Ruído)</span>
+                <span id="sens-val">2.0</span>
+            </div>
+            <input type="range" id="sensitivity-slider" min="0.001" max="0.1" step="0.001" value="0.02" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 mb-3">
+            
+            <div class="text-xs text-gray-400 mb-1 flex justify-between">
+                <span>Volume (Sopro)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div id="vu-meter" class="h-full bg-gradient-to-r from-green-500 via-yellow-400 to-red-500" style="width: 0%; transition: width 0.05s ease-out;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDES DA APRESENTAÇÃO (GERADOS DINAMICAMENTE PELO JAVASCRIPT) -->
+    <div id="presentation">
+        <!-- As imagens do GitHub serão injetadas aqui -->
+    </div>
+
+    <script>
+        // --- 1. GERAÇÃO DOS SLIDES (IMAGENS DO GITHUB) ---
+        const presentationDiv = document.getElementById('presentation');
+        const totalSlides = 26;
+        const githubBaseUrl = "https://raw.githubusercontent.com/GlauberLASantiago/eesc-music-tech-brasil-2026-glauber-fred/main/Slide";
+        
+        for (let i = 1; i <= totalSlides; i++) {
+            let slideDiv = document.createElement('div');
+            slideDiv.className = `slide ${i === 1 ? 'active' : ''}`;
+            slideDiv.id = `slide-${i - 1}`;
+            slideDiv.style.backgroundImage = `url('${githubBaseUrl}${i}.JPG')`;
+            presentationDiv.appendChild(slideDiv);
+        }
+
+        // --- 2. MAPEAMENTO DA ESCALA CROMÁTICA ---
+        const noteStrings = ["Dó", "Dó#", "Ré", "Ré#", "Mi", "Fá", "Fá#", "Sol", "Sol#", "Lá", "Lá#", "Si"];
+        
+        // Mapeia Dó + Intervalo Cromático para o respectivo slide
+        const slideTriggers = {
+            'Dó,Dó': 0,      // Slide 1 (Dó, Dó normal)
+            'Dó,Dó#': 1,     // Slide 2
+            'Dó,Ré': 2,      // Slide 3
+            'Dó,Ré#': 3,     // Slide 4 (Mib)
+            'Dó,Mi': 4,      // Slide 5
+            'Dó,Fá': 5,      // Slide 6
+            'Dó,Fá#': 6,     // Slide 7
+            'Dó,Sol': 7,     // Slide 8
+            'Dó,Sol#': 8,    // Slide 9
+            'Dó,Lá': 9,      // Slide 10
+            'Dó,Lá#': 10,    // Slide 11 (Sib)
+            'Dó,Si': 11,     // Slide 12
+            'Dó,Dó↑': 12,    // Slide 13 (Dó Oitava Acima)
+            'Dó,Dó#↑': 13,   // Slide 14
+            'Dó,Ré↑': 14,    // Slide 15
+            'Dó,Ré#↑': 15,   // Slide 16
+            'Dó,Mi↑': 16,    // Slide 17
+            'Dó,Fá↑': 17,    // Slide 18
+            'Dó,Fá#↑': 18,   // Slide 19
+            'Dó,Sol↑': 19,   // Slide 20
+            'Dó,Sol#↑': 20,  // Slide 21
+            'Dó,Lá↑': 21,    // Slide 22
+            'Dó,Lá#↑': 22,   // Slide 23
+            'Dó,Si↑': 23,    // Slide 24
+            'Dó,Dó↑↑': 24,   // Slide 25 (Dó Duas Oitavas Acima)
+            'Dó,Dó#↑↑': 25   // Slide 26
+        };
+
+        // --- 3. VARIÁVEIS DE ESTADO DO ÁUDIO ---
+        let audioContext = null;
+        let analyser = null;
+        let mediaStreamSource = null;
+        
+        let currentSequence = [];
+        let sequenceClearTimeout = null; 
+        
+        let lastDetectedNoteFull = null; 
+        let noteSustainFrames = 0;
+        let silenceFrames = 0;
+        
+        let lastRegisteredMidi = null;      
+        let lastActiveMidi = null;          
+        let currentSlideIndex = 0;
+
+        // Elementos UI
+        const startBtn = document.getElementById('start-btn');
+        const startOverlay = document.getElementById('start-overlay');
+        const hud = document.getElementById('hud');
+        const noteDisplay = document.getElementById('current-note');
+        const freqDisplay = document.getElementById('current-freq');
+        const sequenceDisplay = document.getElementById('sequence-display');
+        const pageIndicator = document.getElementById('page-indicator');
+        const sensSlider = document.getElementById('sensitivity-slider');
+        const sensValDisplay = document.getElementById('sens-val');
+        const vuMeter = document.getElementById('vu-meter');
+        
+        let sensitivityThreshold = 0.02; 
+
+        // Atualiza UI da Sensibilidade
+        sensSlider.addEventListener('input', (e) => {
+            sensitivityThreshold = parseFloat(e.target.value);
+            sensValDisplay.innerText = (sensitivityThreshold * 100).toFixed(1);
+        });
+
+        // Inicia
+        startBtn.addEventListener('click', async () => {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: {
+                    echoCancellation: false,
+                    autoGainControl: false,
+                    noiseSuppression: false
+                } });
+                
+                startOverlay.style.opacity = '0';
+                setTimeout(() => startOverlay.style.display = 'none', 500);
+                hud.classList.remove('hidden');
+
+                mediaStreamSource = audioContext.createMediaStreamSource(stream);
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                mediaStreamSource.connect(analyser);
+                
+                updatePitch();
+            } catch (err) {
+                alert('Erro ao aceder ao microfone. Verifique as permissões.');
+            }
+        });
+
+        function noteFromPitch(frequency) {
+            return Math.round(12 * (Math.log(frequency / 440) / Math.log(2))) + 69;
+        }
+
+        function autoCorrelate(buf, sampleRate) {
+            let SIZE = buf.length;
+            let rms = 0;
+
+            for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+            rms = Math.sqrt(rms / SIZE);
+            
+            // VU Meter UI
+            let vuPercent = Math.min(100, (rms / 0.15) * 100);
+            if (vuMeter) vuMeter.style.width = vuPercent + '%';
+
+            // Gate de Sensibilidade
+            if (rms < sensitivityThreshold) return -1;
+
+            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+            for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+            for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+            buf = buf.slice(r1, r2);
+            SIZE = buf.length;
+
+            let c = new Array(SIZE).fill(0);
+            for (let i = 0; i < SIZE; i++)
+                for (let j = 0; j < SIZE - i; j++)
+                    c[i] = c[i] + buf[j] * buf[j + i];
+
+            let d = 0; while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < SIZE; i++) {
+                if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+            }
+            return sampleRate / maxpos;
+        }
+
+        const buf = new Float32Array(2048);
+        function updatePitch() {
+            analyser.getFloatTimeDomainData(buf);
+            let ac = autoCorrelate(buf, audioContext.sampleRate);
+
+            if (ac !== -1) {
+                silenceFrames = 0;
+                let concertNoteNum = noteFromPitch(ac);
+                
+                // Transposição Bb
+                let trumpetNoteNum = concertNoteNum + 2; 
+                
+                let noteNameBase = noteStrings[trumpetNoteNum % 12];
+                let octave = Math.floor(trumpetNoteNum / 12) - 1;
+                let noteNameFull = noteNameBase + octave;
+
+                freqDisplay.innerText = Math.round(ac) + " Hz";
+
+                if (noteNameFull === lastDetectedNoteFull) {
+                    noteSustainFrames++;
+                    if (noteSustainFrames === 8) { // Confirmação da nota
+                        registerNote(noteNameBase, trumpetNoteNum);
+                    }
+                } else {
+                    lastDetectedNoteFull = noteNameFull;
+                    noteSustainFrames = 0;
+                    noteDisplay.innerText = noteNameBase; 
+                }
+            } else {
+                silenceFrames++;
+                if (silenceFrames > 15) {
+                    noteDisplay.innerText = "-";
+                    freqDisplay.innerText = "-- Hz";
+                    lastRegisteredMidi = null; // Permite repetir notas após pausa
+                }
+            }
+
+            requestAnimationFrame(updatePitch);
+        }
+
+        function registerNote(noteNameBase, midiNum) {
+            if (midiNum !== lastRegisteredMidi) {
+                let triggerToken = noteNameBase;
+                
+                // CALCULA SE HOUVE SALTO DE OITAVA EM RELAÇÃO À ÚLTIMA NOTA TOCADA
+                if (lastActiveMidi !== null) {
+                    let octaveA = Math.floor(lastActiveMidi / 12);
+                    let octaveB = Math.floor(midiNum / 12);
+                    let octaveDiff = octaveB - octaveA;
+                    
+                    if (octaveDiff === 1) triggerToken += "↑";
+                    else if (octaveDiff === 2) triggerToken += "↑↑";
+                    else if (octaveDiff === 3) triggerToken += "↑↑↑";
+                    else if (octaveDiff === -1) triggerToken += "↓";
+                    else if (octaveDiff === -2) triggerToken += "↓↓";
+                }
+
+                currentSequence.push(triggerToken);
+                if (currentSequence.length > 5) currentSequence.shift();
+                
+                lastRegisteredMidi = midiNum;
+                lastActiveMidi = midiNum;
+                
+                updateSequenceUI();
+                checkSlideTriggers();
+
+                // Limpa sequência após 5 segundos sem tocar
+                if (sequenceClearTimeout) clearTimeout(sequenceClearTimeout);
+                sequenceClearTimeout = setTimeout(() => {
+                    currentSequence = [];
+                    updateSequenceUI();
+                }, 5000);
+            }
+        }
+
+        function checkSlideTriggers() {
+            let seqStr = currentSequence.join(',');
+            
+            for (const [triggerPattern, targetSlideIndex] of Object.entries(slideTriggers)) {
+                if (seqStr.endsWith(triggerPattern)) {
+                    goToSlide(targetSlideIndex);
+                    
+                    // Efeito visual de sucesso
+                    hud.classList.add('ring-4', 'ring-green-500', 'bg-green-900/50');
+                    setTimeout(() => hud.classList.remove('ring-4', 'ring-green-500', 'bg-green-900/50'), 500);
+                    
+                    currentSequence = []; 
+                    updateSequenceUI();
+                    if (sequenceClearTimeout) clearTimeout(sequenceClearTimeout);
+                    break; 
+                }
+            }
+        }
+
+        function updateSequenceUI() {
+            sequenceDisplay.innerHTML = '';
+            currentSequence.forEach(n => {
+                let el = document.createElement('div');
+                el.className = 'bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center justify-center min-w-[30px]';
+                el.innerText = n;
+                sequenceDisplay.appendChild(el);
+            });
+        }
+
+        function goToSlide(index) {
+            const allSlides = document.querySelectorAll('.slide');
+            if (index < 0 || index >= allSlides.length) return;
+            
+            allSlides[currentSlideIndex].classList.remove('active');
+            currentSlideIndex = index;
+            allSlides[currentSlideIndex].classList.add('active');
+            
+            pageIndicator.innerText = `${currentSlideIndex + 1} / ${totalSlides}`;
+        }
+        
+        // Atalhos de teclado
+        document.addEventListener('keydown', (e) => {
+            // Setas para navegar manualmente
+            if (e.key === 'ArrowRight') goToSlide(Math.min(currentSlideIndex + 1, totalSlides - 1));
+            if (e.key === 'ArrowLeft') goToSlide(Math.max(currentSlideIndex - 1, 0));
+            
+            // Tecla 'H' para Esconder/Mostrar o HUD e manter a magia intacta
+            if (e.key.toLowerCase() === 'h') {
+                hud.style.opacity = hud.style.opacity === '0' ? '1' : '0';
+                pageIndicator.style.opacity = pageIndicator.style.opacity === '0' ? '1' : '0';
+            }
+        });
+
+    </script>
+</body>
+</html>
