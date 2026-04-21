@@ -385,6 +385,19 @@
             }
         });
 
+        // Navegação por toque (deslizar para esquerda/direita)
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        document.addEventListener('touchend', (e) => {
+            const deltaX = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(deltaX) > 50) {
+                if (deltaX < 0) goToSlide(Math.min(currentSlideIndex + 1, totalSlides - 1)); // deslizar para esquerda → próximo
+                else            goToSlide(Math.max(currentSlideIndex - 1, 0));               // deslizar para direita → anterior
+            }
+        }, { passive: true });
+
     </script>
 </body>
 </html>
